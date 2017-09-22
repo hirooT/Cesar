@@ -73,7 +73,7 @@ public class getdis_ethernet : MonoBehaviour {
             }
         }
         catch (System.Exception e){
-            Debug.Log("<color=red>Error! </color>" + e);
+            Debug.Log("Error!" + e);
         }
         yield return null;
     }
@@ -94,13 +94,13 @@ public class getdis_ethernet : MonoBehaviour {
 
                     if (!SCIP_Reader.MD(receive_data, ref time_stamp, ref distances))
                     {
-                        //Debug.Log("<color=blue>Receive Data: </color>" + receive_data);
+                        //Debug.Log(string.Format("<color=blue>Receive Data: {0}</color>", receive_data));
                         break;
                     }
 
                     if (distances.Count == 0)
                     {
-                        //Debug.Log("<color=red>Receive Data: </color>" + receive_data);
+                        //Debug.Log(string.Format("<color=red>Receive Data: {0}</color>" ,receive_data));
                         continue;
                     }
                     // show distance data
@@ -109,17 +109,7 @@ public class getdis_ethernet : MonoBehaviour {
                         if(showDebugLog) Debug.Log("k: " + k +"  distance: " + distances[k] / 10 + "cm");
                         value = (int)distances[k] / 10;
 
-                        if ((int)distances[k] < range)
-                        {
-                            //Debug.Log("<color=teal>Get distance: </color>" + distances[k] / 10 + "cm");
-                            //tcpconnect = false;
-                            //ipconfig = false;
-                            //write(stream, SCIP_Writer.QT());    // stop measurement mode
-                            //read_line(stream); // ignore echo back
-                            //stream.Close();
-                            //urg.Close();
-                            //Debug.Log("<color=green>Sensor close.</color>");
-                        }
+                        //StopTcpConnect(distances, i);
 
                     }
                 }
@@ -133,6 +123,23 @@ public class getdis_ethernet : MonoBehaviour {
         }
         
     }
+
+    private void StopTcpConnect(List<long> k, int i) {
+        List<long> dis = new List<long>();
+        dis = k;
+        if ((int)dis[i] < range)
+        {
+            Debug.Log(string.Format("<color=teal>Get distance: {0}cm</color>", dis[i] / 10));
+            tcpconnect = false;
+            ipconfig = false;
+            write(stream, SCIP_Writer.QT());    // stop measurement mode
+            read_line(stream); // ignore echo back
+            stream.Close();
+            urg.Close();
+            Debug.Log("<color=green>Sensor close.</color>");
+        }
+    }
+
     static bool write(NetworkStream stream, string data)
     {
         if (stream.CanWrite)

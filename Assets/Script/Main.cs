@@ -8,13 +8,18 @@ public class Main : MonoBehaviour {
     public int trigger_top = 80;
     public int trigger_buttom = 100;
 
-    [Header("Object")]
+    [Header("GameObject")]
     public GameObject[] canvas;
+    public GameObject[] movie_open;
+    public GameObject[] movie_loop;
+    public GameObject[] movie_ending;
+    public GameObject[] movie_other;
 
     [Header("Bool")]
     public bool showDebugLog = true;
     public bool door_status = false;
-    
+
+    private int index = 0;
     private static int val=5000;
     private static string message;
     State state;
@@ -71,6 +76,7 @@ public class Main : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.W)) state = State.M2;
         if (Input.GetKeyDown(KeyCode.E)) state = State.M3;
     }
+
     void DoorStatus()
     {
         message = MessageListenerF.message;
@@ -81,12 +87,33 @@ public class Main : MonoBehaviour {
         else if (message == "0") door_status = true;
 
     }
+
     void FoodTrigger(int val) {
         int distance = val ;
         if (distance > trigger_top && distance < trigger_buttom)
         {
-            Debug.Log("<color=blue>Get Distance: </color>" + val + "cm!");
+            Debug.Log(string.Format("<color=lightblue>Get distance: {0}cm!</color>", val));
             state = State.M3;
+        }
+    }
+
+    void SetMovie()
+    {
+        List<Movie> open = new List<Movie>();
+        List<Movie> loop = new List<Movie>();
+        List<Movie> ending = new List<Movie>();
+
+        for(int i = 0; i < movie_open.Length; i++)
+        {
+            open.Add(new Movie(movie_open[i].name, i));
+        }
+        for(int i = 0; i < movie_loop.Length; i++)
+        {
+            loop.Add(new Movie(movie_loop[i].name, i));
+        }
+        for(int i = 0; i < movie_ending.Length; i++)
+        {
+            ending.Add(new Movie(movie_ending[i].name, i));
         }
     }
 }
