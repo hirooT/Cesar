@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class Main : MonoBehaviour {
 
@@ -80,14 +81,16 @@ public class Main : MonoBehaviour {
     void DoorStatus()
     {
         message = MessageListenerF.message;
-        if (message == "1") {
+        if (message == "1")
+        {
             door_status = false;
             state = State.M1;
-        } 
-        else if (message == "0") door_status = true;
+        }
+        else if (message == "0") {
+            door_status = true;
+        }
 
     }
-
     void FoodTrigger(int val) {
         int distance = val ;
         if (distance > trigger_top && distance < trigger_buttom)
