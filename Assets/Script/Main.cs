@@ -30,11 +30,13 @@ public class Main : MonoBehaviour {
     private int index = 0;
     private static int val=5000;
     private static string message;
+    int flag = 0;
     State state;
     State _state;
 
     // Use this for initialization
     void Start () {
+        alphaInit();
         state = State.M1;
         
 	}
@@ -44,17 +46,32 @@ public class Main : MonoBehaviour {
         StateSwich();
         DoorStatus();
         StateChange();
+        
+        if(state == State.M1)
+        {
+            if (movie_open[index].Control.IsPlaying())
+            {
+                if(canvas[0].GetComponent<CanvasGroup>().alpha != 1)
+                StartCoroutine(FadeIn(canvas[0]));
+            }
+            if ((int)movie_open[index].Control.GetCurrentTimeMs()/1000 > 60 )
+            {
+                StartCoroutine(FadeOut(canvas[0]));     
+            }
+            if (movie_open[index].Control.IsFinished())
+            {
+                state = State.M2;
+            }
+        }
 
+        //Debug.Log((int)acopy.Control.GetCurrentTimeMs()/1000);
+        /*
         if (Input.GetKeyDown(KeyCode.P))
         {
             if (isplaying) isplaying = false;
             else isplaying = true;
         }
-        //if (isplaying) acopy.Play();
-        //else if (!isplaying) acopy.Pause();
-
-        //Debug.Log((int)acopy.Control.GetCurrentTimeMs()/1000);
-        
+        */
     }
     enum State {
         M1, M2, M3
@@ -66,6 +83,7 @@ public class Main : MonoBehaviour {
             {
                 case State.M1:
                     open.GetComponent<DisplayUGUI>()._mediaPlayer = movie_open[index];
+                    //canvas[0].GetComponent<CanvasGroup>().alpha = 1;
                     canvas[0].SetActive(true);
                     canvas[1].SetActive(false);
                     canvas[2].SetActive(false);
@@ -93,6 +111,9 @@ public class Main : MonoBehaviour {
     {
         //canvas alpha init
         //M1:0 M2:1 M3-1:0 M3-2:0
+        canvas[0].GetComponent<CanvasGroup>().alpha = 0;
+        canvas[1].GetComponent<CanvasGroup>().alpha = 1;
+        canvas[2].GetComponent<CanvasGroup>().alpha = 1;
     }
 
     void StateSwich()
@@ -113,6 +134,7 @@ public class Main : MonoBehaviour {
                 if (index < 2) index++;
                 else index = 0;
                 //movie_open[index].Pause();
+                alphaInit();
                 movie_open[index].Rewind(true);
                 Debug.Log("door close.");
             }
@@ -156,5 +178,28 @@ public class Main : MonoBehaviour {
         }
     }
 
+    IEnumerator FadeOut(GameObject canvas)
+    {
+        CanvasGroup _canvas = canvas.GetComponent<CanvasGroup>();
+        _canvas.alpha -= Time.deltaTime * 1.0f;
+        if (_canvas.alpha < 0)
+        {
+            _canvas.alpha = 0;
+        }
+        //Debug.Log(_canvas.alpha);
+            
+        yield return null;
+    }
+    IEnumerator FadeIn(GameObject canvas)
+    {
+        CanvasGroup _canvas = canvas.GetComponent<CanvasGroup>();
+        _canvas.alpha += Time.deltaTime * 1.5f;
+        if (_canvas.alpha > 1)
+        {
+            _canvas.alpha = 1;
+        }
+        //Debug.Log(_canvas.alpha);
 
+        yield return null;
+    }
 }
