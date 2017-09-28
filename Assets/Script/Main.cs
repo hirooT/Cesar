@@ -38,8 +38,8 @@ public class Main : MonoBehaviour {
     void Start () {
         alphaInit();
         state = State.M1;
-        
-	}
+        //StateChange();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -52,7 +52,7 @@ public class Main : MonoBehaviour {
             if (movie_open[index].Control.IsPlaying())
             {
                 if(canvas[0].GetComponent<CanvasGroup>().alpha != 1)
-                StartCoroutine(FadeIn(canvas[0]));
+                    StartCoroutine(FadeIn(canvas[0]));
             }
             if ((int)movie_open[index].Control.GetCurrentTimeMs()/1000 > 60 )
             {
@@ -131,11 +131,16 @@ public class Main : MonoBehaviour {
             {
                 door_status = false;
                 state = State.M1;
+                StateChange();
                 if (index < 2) index++;
                 else index = 0;
                 //movie_open[index].Pause();
                 alphaInit();
-                movie_open[index].Rewind(true);
+                for(int i = 0; i < 3; i++)
+                {
+                    movie_open[i].Rewind(true);
+                }
+                
                 Debug.Log("door close.");
             }
             else if (message == "1")
