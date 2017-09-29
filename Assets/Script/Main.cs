@@ -25,11 +25,13 @@ public class Main : MonoBehaviour {
     public bool showDebugLog = true;
     public bool door_status = false;
     public bool isplaying = false;
+    public static bool msgarrive = false;
 
     [SerializeField]
     private int index = 0;
     private static int val=5000;
     private static string message;
+    private int firststart = 0;
     int flag = 0;
     State state;
     State _state;
@@ -38,14 +40,18 @@ public class Main : MonoBehaviour {
     void Start () {
         alphaInit();
         state = State.M1;
-        //StateChange();
+        StateChange();
     }
 	
 	// Update is called once per frame
 	void Update () {
         StateSwich();
-        DoorStatus();
-        StateChange();
+        if (msgarrive)
+        {
+            DoorStatus();
+        }
+        
+        //
         
         if(state == State.M1)
         {
@@ -61,6 +67,7 @@ public class Main : MonoBehaviour {
             if (movie_open[index].Control.IsFinished())
             {
                 state = State.M2;
+                StateChange();
             }
         }
 
@@ -125,34 +132,43 @@ public class Main : MonoBehaviour {
 
     void DoorStatus()
     {
-        if(message != MessageListenerF.message)
-        {
-            if (message == "0")
+            if (message != MessageListenerF.message)
             {
-                door_status = false;
-                state = State.M1;
-                StateChange();
-                if (index < 2) index++;
-                else index = 0;
-                //movie_open[index].Pause();
-                alphaInit();
-                for(int i = 0; i < 3; i++)
-                {
-                    movie_open[i].Rewind(true);
-                }
                 
-                Debug.Log("door close.");
-            }
-            else if (message == "1")
-            {
-                door_status = true;
-                movie_open[index].Play();
-                Debug.Log("door open.");
-            }
+                if (message == "0")
+                    {
+                        door_status = false;
+                        state = State.M1;
+                        StateChange();
+                
+                    
+                        //movie_open[index].Pause();
+                        alphaInit();
+                        for (int i = 0; i < 3; i++)
+                        {
+                            movie_open[i].Rewind(true);
+                        }
+
+                    if (firststart > 0)
+                    {
+                        if (index < 2) index++;
+                        else index = 0;
+                    }
+                    Debug.Log("door close.");
+                    StateChange();
+                    }
+                else if (message == "1")
+                {
+                    door_status = true;
+                    movie_open[index].Play();
+                if (firststart == 0) firststart++;
+                    Debug.Log("door open.");
+                }
+            
         }
-        message = MessageListenerF.message;
-        
-        //Debug.Log(message);
+            message = MessageListenerF.message;
+            //Debug.Log(message);
+
     }
     void FoodTrigger(int val) {
         int distance = val ;
@@ -160,6 +176,7 @@ public class Main : MonoBehaviour {
         {
             Debug.Log(string.Format("<color=lightblue>Get distance: {0}cm!</color>", val));
             state = State.M3;
+            StateChange();
         }
     }
 

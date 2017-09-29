@@ -27,6 +27,7 @@ public class MessageListenerF : MonoBehaviour {
         if (!showOnce)
         {
             Debug.Log("<color=teal>Serial port message arrived!</color>");
+            Main.msgarrive = true;
             showOnce = true;
         }
         if (showDebugLog)
